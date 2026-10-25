@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Personal Blog</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6fb;
+            color: #222;
+        }
+
+        header {
+            background: #202b46;
+            color: white;
+            text-align: center;
+            padding: 35px 20px;
+        }
+
+        header h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            color: #d5dced;
+        }
+
+        .container {
+            max-width: 1150px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: space-between;
+            margin-bottom: 25px;
+        }
+
+        #search {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .filters button {
+            padding: 11px 17px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background: white;
+            color: #202b46;
+            font-weight: bold;
+        }
+
+        .filters button.active,
+        .filters button:hover {
+            background: #202b46;
+            color: white;
+        }
+
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .blog-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px #0000000d;
+            transition: transform 0.3s;
+        }
+
+        .blog-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .blog-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .category {
+            display: inline-block;
+            background: #e8edff;
+            color: #304cc7;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        .card-content h2 {
+            font-size: 21px;
+            margin-bottom: 10px;
+        }
+
+        .card-content p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .date {
+            color: #888;
+            font-size: 13px;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin: 35px 0;
+        }
+
+        .pagination button {
+            padding: 10px 18px;
+            background: #202b46;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .pagination button:disabled {
+            background: #aaa;
+            cursor: not-allowed;
+        }
+
+        #pageInfo {
+            font-weight: bold;
+        }
+
+        #noResults {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            display: none;
+        }
+
+        footer {
+            text-align: center;
+            background: #202b46;
+            color: white;
+            padding: 22px;
+            margin-top: 30px;
+        }
+
+        @media (max-width: 850px) {
+            .blog-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 550px) {
+            header h1 {
+                font-size: 28px;
+            }
+
+            .blog-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            #search {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>My Personal Blog</h1>
+        <p>Ideas, adventures, technology and delicious food!</p>
+    </header>
+
+    <main class="container">
+
+        <div class="controls">
+            <input
+                type="text"
+                id="search"
+                placeholder="Search blog posts by title..."
+                aria-label="Search blog posts"
+            >
+
+            <div class="filters">
+                <button class="active" data-category="All">All</button>
+                <button data-category="Tech">Tech</button>
+                <button data-category="Travel">Travel</button>
+                <button data-category="Food">Food</button>
+            </div>
+        </div>
+
+        <section class="blog-grid" id="blogGrid"></section>
+
+        <p id="noResults">No blog posts found. Try another search!</p>
+
+        <div class="pagination">
+            <button id="prevBtn">Previous</button>
+            <span id="pageInfo"></span>
+            <button id="nextBtn">Next</button>
+        </div>
+
+    </main>
+
+    <footer>
+        <p>© 2026 My Personal Blog | Made with ❤️</p>
+    </footer>
+
+    <script>
+        const posts = [
+            {
+                title: "The Future of Artificial Intelligence",
+                category: "Tech",
+                date: "October 20, 2026",
+                description: "Discover how AI is transforming our lives, workplaces, and the future of technology.",
+                image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                title: "Exploring the Mountains",
+                category: "Travel",
+                date: "October 18, 2026",
+                description: "A memorable journey through beautiful mountains, peaceful valleys, and amazing landscapes.",
+                image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                title: "Easy Homemade Pizza",
+                category: "Food",
+                date: "October 15, 2026",
+                description: "Make a delicious homemade pizza with simple ingredients and these easy cooking tips.",
+                image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                title: "How Websites Work",
+                category: "Tech",
+                date: "October 12, 2026",
+                description: "Learn the basics of HTML, CSS, and JavaScript and how they bring websites to life.",
+                image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                title: "A Weekend in Paris",
+                category: "Travel",
+                date: "October 10, 2026",
+                description: "Explore charming streets, famous landmarks, and unforgettable experiences in Paris.",
+                image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                title: "Healthy Breakfast Ideas",
+                category: "Food",
+                date: "October 8, 2026",
+                description: "Start your day right with these quick, nutritious, and tasty breakfast recipes.",
+                image: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                title: "Cybersecurity for Beginners",
+                category: "Tech",
+                date: "October 5, 2026",
+                description: "Simple ways to protect your online accounts, passwords, and personal information.",
+                image: "https://images.unsplash.com/photo-1510511459019-5dda7724fd87?auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                title: "Discover Beautiful Beaches",
+                category: "Travel",
+                date: "October 3, 2026",
+                description: "Visit stunning coastlines and discover why beach holidays are perfect for relaxing.",
+                image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                title: "The Secret of Perfect Coffee",
+                category: "Food",
+                date: "October 1, 2026",
+                description: "Learn how to prepare a rich, aromatic cup of coffee right in your own kitchen.",
+                image: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=800&q=80"
+            }
+        ];
+
+        const postsPerPage = 6;
+
+        let selectedCategory = "All";
+        let currentPage = 1;
+
+        const blogGrid = document.getElementById("blogGrid");
+        const searchInput = document.getElementById("search");
+        const noResults = document.getElementById("noResults");
+        const prevBtn = document.getElementById("prevBtn");
+        const nextBtn = document.getElementById("nextBtn");
+        const pageInfo = document.getElementById("pageInfo");
+
+        function displayPosts() {
+            const keyword = searchInput.value.toLowerCase().trim();
+
+            const filteredPosts = posts.filter(post => {
+                const matchesCategory =
+                    selectedCategory === "All" ||
+                    post.category === selectedCategory;
+
+                const matchesSearch =
+                    post.title.toLowerCase().includes(keyword);
+
+                return matchesCategory && matchesSearch;
+            });
+
+            const totalPages = Math.ceil(
+                filteredPosts.length / postsPerPage
+            );
+
+            if (currentPage > totalPages) {
+                currentPage = Math.max(1, totalPages);
+            }
+
+            const start = (currentPage - 1) * postsPerPage;
+
+            const visiblePosts = filteredPosts.slice(
+                start,
+                start + postsPerPage
+            );
+
+            blogGrid.innerHTML = visiblePosts.map(post => `
+                <article class="blog-card">
+                    <img
+                        src="${post.image}"
+                        alt="${post.title}"
+                        loading="lazy"
+                    >
+
+                    <div class="card-content">
+                        <span class="category">${post.category}</span>
+                        <h2>${post.title}</h2>
+                        <p>${post.description}</p>
+                        <span class="date">${post.date}</span>
+                    </div>
+                </article>
+            `).join("");
+
+            noResults.style.display =
+                filteredPosts.length === 0 ? "block" : "none";
+
+            blogGrid.style.display =
+                filteredPosts.length === 0 ? "none" : "grid";
+
+            pageInfo.textContent =
+                `Page ${totalPages === 0 ? 0 : currentPage} of ${totalPages}`;
+
+            prevBtn.disabled = currentPage === 1;
+            nextBtn.disabled =
+                totalPages === 0 || currentPage >= totalPages;
+        }
+
+        document.querySelectorAll(".filters button").forEach(button => {
+            button.addEventListener("click", () => {
+                document.querySelector(".filters button.active")
+                    .classList.remove("active");
+
+                button.classList.add("active");
+                selectedCategory = button.dataset.category;
+                currentPage = 1;
+
+                displayPosts();
+            });
+        });
+
+        searchInput.addEventListener("input", () => {
+            currentPage = 1;
+            displayPosts();
+        });
+
+        prevBtn.addEventListener("click", () => {
+            if (currentPage > 1) {
+                currentPage--;
+                displayPosts();
+            }
+        });
+
+        nextBtn.addEventListener("click", () => {
+            currentPage++;
+            displayPosts();
+        });
+
+        displayPosts();
+    </script>
+
+</body>
+</html>
